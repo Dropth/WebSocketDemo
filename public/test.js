@@ -1,36 +1,38 @@
-/**
- * Created by af121111 on 21/11/16.
- */
+var wsbroker = "127.0.0.1";  //mqtt websocket enabled broker
+var wsport = 8080;// port for above
+var client = new Paho.MQTT.Client(wsbroker, wsport,
+    "myclientid_" + parseInt(Math.random() * 100, 10));
+client.onConnectionLost = function (responseObject) {
+    console.log("connection lost: " + responseObject.errorMessage);
+};
+client.onMessageArrived = function (message) {
 
-// Create a client instance
-client = new Paho.MQTT.Client(location.hostname, 9001, "clientId");
+    var messages = document.querySelector('#messages');
+    var line;
+    line = document.createElement('li');
+    line.textContent = message.destinationName+ ' -- '+ message.payloadString;
+    messages.appendChild(line);
 
-// set callback handlers
-client.onConnectionLost = onConnectionLost;
-client.onMessageArrived = onMessageArrived;
+    console.log(message.destinationName, ' -- ', message.payloadString);
+};
+var options = {
+    timeout: 3,
+    onSuccess: function () {
+        console.log("mqtt connected");
+        // Connection succeeded; subscribe to our topic, you can add multile lines of these
+        client.subscribe('value/#', {qos: 1});
 
-// connect the client
-client.connect({onSuccess:onConnect});
+        //use the below if you want to publish to a topic on connect
+        /*message = new Paho.MQTT.Message("Hello");
+        message.destinationName = "value/#" +
+            "";
+        client.send(message);*/
 
-
-// called when the client connects
-function onConnect() {
-    // Once a connection has been made, make a subscription and send a message.
-    console.log("onConnect");
-    client.subscribe("value/#");
-    message = new Paho.MQTT.Message("Hello");
-    message.destinationName = "value/#";
-    client.send(message);
-}
-
-// called when the client loses its connection
-function onConnectionLost(responseObject) {
-    if (responseObject.errorCode !== 0) {
-        console.log("onConnectionLost:"+responseObject.errorMessage);
+    },
+    onFailure: function (message) {
+        console.log("Connection failed: " + message.errorMessage);
     }
-}
-
-// called when a message arrives
-function onMessageArrived(message) {
-    console.log("onMessageArrived:"+message.payloadString);
+};
+function init() {
+    client.connect(options);
 }
