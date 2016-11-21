@@ -1,8 +1,8 @@
 var http = require('http'),
-  WebSocketServer = require('ws').Server,
-  express = require('express'),
-  port = 1234,
-  host = '0.0.0.0';
+    WebSocketServer = require('ws').Server,
+    express = require('express'),
+    port = 1234,
+    host = '0.0.0.0';
 
 // create a new HTTP server to deal with low level connection details (tcp connections, sockets, http handshakes, etc.)
 var server = http.createServer();
@@ -32,8 +32,8 @@ wss.on('connection', function(client) {
   // retrieve the name in the cookies
   var cookies = client.upgradeReq.headers.cookie.split(';');
   var wsname = cookies.find((c) => {
-    return c.match(/^\s*wsname/) !== null;
-  });
+        return c.match(/^\s*wsname/) !== null;
+});
   wsname = wsname.split('=')[1];
 
   // greet the newly connected user
