@@ -2,12 +2,12 @@
  * Created by af121111 on 21/11/16.
  */
 
-export class Data {
+class Data {
     constructor() {
     }
 }
 
-export class Datum extends Data {
+class Datum extends Data {
     constructor(value) {
         super();
         this._value = value;
@@ -19,11 +19,9 @@ export class Datum extends Data {
         this._value = val;
     }
 
-    isOpen () {return this._value==1;}
-
 }
 
-export class Sensor {
+class Sensor {
 
     constructor(id,name,type) {
         this._id = id;
@@ -60,9 +58,11 @@ export class Sensor {
         this._data = dat;
     }
 
+    toString() {return "ID = " + this._id + ", Name = " + this._name + ", Type = " + this._type + ", Data = " + this._data.value;}
+
 }
 
-export class Positive extends Sensor {
+class Positive extends Sensor {
 
     constructor(id,name,type) {
         super (id,name,type);
@@ -71,7 +71,7 @@ export class Positive extends Sensor {
     }
 }
 
-export class Percent extends Sensor {
+class Percent extends Sensor {
 
     constructor(id,name,type) {
         super (id,name,type);
@@ -80,7 +80,7 @@ export class Percent extends Sensor {
     }
 }
 
-export class OnOff extends Sensor {
+class OnOff extends Sensor {
 
     constructor(id,name,type) {
         super (id,name,type);
@@ -89,7 +89,7 @@ export class OnOff extends Sensor {
     }
 }
 
-export class OpenClose extends Sensor {
+class OpenClose extends Sensor {
 
     constructor(id,name,type) {
         super (id,name,type);
