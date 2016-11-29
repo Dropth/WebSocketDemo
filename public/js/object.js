@@ -7,6 +7,31 @@ class Data {
     }
 }
 
+class TimeSeries extends Data {
+    constructor(values,labels) {
+        super();
+        this._values=values;
+        this._labels=labels;
+    }
+    get values() {
+        return this._values;
+    }
+    set values(value) {
+        this._values = value;
+    }
+    set labels(label) {
+        this._labels = label;
+    }
+    get labels() {
+        return this._labels;
+    }
+
+    ajouter (val,date) {
+        this._values.push(val);
+        this._labels.push(date);
+    }
+}
+
 class Datum extends Data {
     constructor(value) {
         super();

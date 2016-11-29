@@ -10,6 +10,11 @@ const SensorType = {
 }
 let cpt=0;
 
+let tempChambre=0;
+let tempSalle=0;
+let yeux=0;
+let attention=0;
+
 var wsbroker = document.getElementById("adresse").value;//"127.0.0.1";  //mqtt websocket enabled broker
 var wsport = parseInt(document.getElementById("port").value);// port for above
 
@@ -20,7 +25,9 @@ client.onConnectionLost = function (responseObject) {
 };
 client.onMessageArrived = function (message) {
 
-    let s = createSensor(message.destinationName, message.payloadString);
+    let s = sensor(message.destinationName, message.payloadString);
+    //let s = createSensor(message.destinationName, message.payloadString, true);
+
 
     var test = document.getElementById("messages");
     var line ='';
@@ -33,7 +40,7 @@ client.onMessageArrived = function (message) {
     line += "</td>";
     line += "</tr>";
 
-    test.innerHTML=test.innerHTML + line;
+    test.innerHTML+=line;
 };
 var options = {
     timeout: 3,
@@ -52,7 +59,7 @@ var options = {
         string += "</thead>";
         string += "<tbody id=\"messages\"></tbody>";
 
-        table.innerHTML=table.innerHTML + string;
+        table.innerHTML+=string;
 
     },
     onFailure: function (message) {
@@ -92,14 +99,18 @@ function subTopic() {
 }
 
 
-function createSensor(nom,data) {
+function createSensor(nom,data,isok) {
 
     var obj = JSON.parse(data);
 
-    let id = cpt++;
+
     let name = nom.split("/")[1];
+    let id = name;
     let res;
-    let dat = new Datum(obj.value);
+    let dat = new Data();
+
+     dat = new Datum(obj.value);
+
     switch (obj.type) {
         case SensorType.pos:
             res = new Positive(id, name, obj.type, dat);
@@ -119,6 +130,62 @@ function createSensor(nom,data) {
     }
 
     Object.assign(res.data, dat);
+
     return res;
 
+}
+
+function sensor (message,data) {
+    let name = message.split("/")[1];
+    var obj = JSON.parse(data);
+
+
+    if (name == "temperatureChambre") {
+        if(tempChambre == 0) {
+            let t = createSensor(message,data,true);
+            tempChambre = t;
+            Object.assign(t, tempChambre);
+        }
+        else {
+            tempChambre.data.value = obj.value;
+        }
+
+        return tempChambre;
+    }
+    else if (name == "temperatureSalleA111") {
+        if (tempSalle != 0) {
+            tempSalle.data.value = obj.value;
+        }
+        else {
+            let t = createSensor(message,data,true);
+            tempSalle = t;
+            Object.assign(t, tempSalle);
+        }
+
+        return tempSalle;
+    }
+    else if (name == "MesYeux") {
+        if (yeux != 0) {
+            yeux.data.value = obj.value;
+        }
+        else {
+            let t = createSensor(message,data,false);
+            yeux = t;
+            Object.assign(t, yeux);
+        }
+
+        return yeux;
+    }
+    else if (name == "MonAttention") {
+        if (attention != 0) {
+            attention.data.value = obj.value;
+        }
+        else {
+            let t = createSensor(message,data,false);
+            attention = t;
+            Object.assign(t, attention);
+        }
+
+        return attention;
+    }
 }
